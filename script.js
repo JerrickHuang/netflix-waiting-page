@@ -61,3 +61,15 @@ messageText.innerText =
 messages[randomIndex];
 
 },5000);
+
+let button =
+
+document.getElementById("nextEpisode");
+
+button.addEventListener("click",()=>{
+
+button.innerText =
+
+"正在努力載入下一集...";
+
+});
