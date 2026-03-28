@@ -136,13 +136,33 @@ button.addEventListener("click", () => {
   }, 120);
 });
 
-// ===== Toast =====
+// ===== Toast（固定暫留 4 秒，避免快速覆蓋） =====
+let _toastTimer = null;
+
 function showToast(msg) {
   const t = document.getElementById('toast');
   if (!t) return;
+
+  // 清掉舊的 timer，先讓它滑出
+  if (_toastTimer) {
+    clearTimeout(_toastTimer);
+    _toastTimer = null;
+  }
+
+  // 先移除 show，強制 reflow，再重新加回來（確保動畫重新觸發）
+  t.classList.remove('show');
   t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
+
+  // 用 requestAnimationFrame 確保 DOM 更新後才加 show
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      t.classList.add('show');
+      _toastTimer = setTimeout(() => {
+        t.classList.remove('show');
+        _toastTimer = null;
+      }, 4000); // 固定 4 秒，夠讀完又不拖太久
+    });
+  });
 }
 
 // ===== 粒子背景 =====
