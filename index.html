@@ -2,77 +2,68 @@
 <html lang="zh-TW">
 
 <head>
-<meta charset="UTF-8">
-<title>Netflix Loading</title>
-
-<link rel="stylesheet" href="style.css">
-
-<style>
-  /* 讓 body 支援 z-index 堆疊 */
-  body { position: relative; overflow: hidden; }
-</style>
-
+  <meta charset="UTF-8">
+  <title>Netflix Loading</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- 粒子背景 -->
-<canvas id="particles"></canvas>
+  <canvas id="particles"></canvas>
 
-<div class="logo">NETFLIX</div>
+  <div class="logo">NETFLIX</div>
 
-<div class="container">
+  <div class="page-wrapper">
 
-<h1>影片正在努力載入中...</h1>
+    <div class="container">
 
-<!-- 爆米花互動列 -->
-<div class="popcorn-row" id="popcornRow">
-  <span>🍿</span><span>🍿</span><span>🍿</span><span>🍿</span><span>🍿</span>
-</div>
+      <h1>影片正在努力載入中...</h1>
 
-<div class="progress-bar">
-<div class="progress"></div>
-</div>
+      <div class="popcorn-row" id="popcornRow">
+        <span>🍿</span><span>🍿</span><span>🍿</span><span>🍿</span><span>🍿</span>
+      </div>
 
-<!-- 翻牌倒數計時器 -->
-<div class="countdown-wrap">
-  <div class="countdown-unit">
-    <div class="countdown-num" id="cdMin">00</div>
-    <div class="countdown-label">分鐘</div>
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+
+      <div class="countdown-wrap">
+        <div class="countdown-unit">
+          <div class="countdown-num" id="cdMin">00</div>
+          <div class="countdown-label">分鐘</div>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit">
+          <div class="countdown-num" id="cdSec">60</div>
+          <div class="countdown-label">秒</div>
+        </div>
+      </div>
+
+      <p id="message">
+        你的影集沒有消失 🍿
+        只是伺服器正在補咖啡中
+      </p>
+
+      <div class="status-msg" id="statusMsg">☕ 伺服器正在補咖啡中，請稍候...</div>
+
+      <button id="nextEpisode">▶ 播放下一集</button>
+
+    </div>
+
+    <div class="game-section">
+      <p class="game-prompt">無聊嗎？按 <strong>空白鍵</strong> 或點擊讓伺服器跳過障礙！</p>
+      <canvas id="gameCanvas" width="500" height="100"></canvas>
+      <p class="game-score">分數：<span id="scoreDisplay">0</span></p>
+    </div>
+
+    <button class="secret-btn" onclick="revealEasterEgg()">🔍 找找彩蛋</button>
+    <p class="konami-hint">↑ ↑ ↓ ↓ ← → ← → B A</p>
+
   </div>
-  <div class="countdown-sep">:</div>
-  <div class="countdown-unit">
-    <div class="countdown-num" id="cdSec">60</div>
-    <div class="countdown-label">秒</div>
-  </div>
-</div>
 
-<p id="message">
-你的影集沒有消失 🍿
-只是伺服器正在補咖啡中
-</p>
+  <div class="toast" id="toast"></div>
 
-<button id="nextEpisode">
-▶ 播放下一集
-</button>
-
-</div>
-
-<!-- 小遊戲區 -->
-<div class="game-section">
-  <p class="game-prompt">無聊嗎？按 <strong>空白鍵</strong> 或點擊讓伺服器跳過障礙！</p>
-  <canvas id="gameCanvas" width="500" height="100"></canvas>
-  <p class="game-score">分數：<span id="scoreDisplay">0</span></p>
-</div>
-
-<!-- 彩蛋按鈕 -->
-<button class="secret-btn" onclick="revealEasterEgg()">🔍 找找彩蛋</button>
-<p class="konami-hint">↑ ↑ ↓ ↓ ← → ← → B A</p>
-
-<!-- Toast 通知 -->
-<div class="toast" id="toast"></div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 
 </body>
 
