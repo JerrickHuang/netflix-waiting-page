@@ -25,8 +25,9 @@ const countdownTimer = setInterval(() => {
     clearInterval(countdownTimer);
     flipTo(elMin, '00');
     flipTo(elSec, '00');
-    showToast('🎉 咖啡喝完了！重新載入中...');
-    setTimeout(() => location.reload(), 3000);
+    showToast('☕ 咖啡喝完了！繼續玩遊戲吧！');
+    SFX.countdownEnd();
+    // 倒數結束，不影響遊戲，不 reload
     return;
   }
   flipTo(elMin, pad(Math.floor(time / 60)));
@@ -287,7 +288,10 @@ function showToast(msg) {
     ctx.fillStyle = '#aaa';
     ctx.font = '13px Arial';
     ctx.fillText('點擊重新開始', gc.width / 2, 68);
-    obs = []; score = 0; spd = 2.5; frame = 0; spawnT = 0;
+    obs = []; spd = 2.5; frame = 0; spawnT = 0;
+    score = 0; // 死亡才重置分數
+    const sd = document.getElementById('scoreDisplay');
+    if (sd) sd.textContent = '0';
   }
 
   gc.addEventListener('click', () => {
