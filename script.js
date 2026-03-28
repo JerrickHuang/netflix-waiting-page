@@ -1,10 +1,17 @@
-// 翻牌倒數（替換原本的 setInterval countdown）
+// ===== 進度條 =====
+let progress = document.querySelector(".progress");
+let width = 0;
+setInterval(() => {
+  if (width < 100) { width++; progress.style.width = width + "%"; }
+}, 600);
+
+// ===== 翻牌倒數 =====
 let time = 60;
 
 function pad(n) { return String(n).padStart(2, '0'); }
 
 function flipTo(el, val) {
-  if (el.textContent === val) return;
+  if (!el || el.textContent === val) return;
   el.classList.add('flip');
   setTimeout(() => { el.textContent = val; el.classList.remove('flip'); }, 150);
 }
@@ -26,81 +33,39 @@ const countdownTimer = setInterval(() => {
   flipTo(elSec, pad(time % 60));
 }, 1000);
 
-setInterval(() => {
-
-time--;
-
-countdownElement.innerText =
-
-"預估恢復時間：" + time + " 秒";
-
-}, 1000);
-
-let progress =
-
-document.querySelector(".progress");
-
-let width = 0;
-
-setInterval(() => {
-
-if(width < 100){
-
-width++;
-
-progress.style.width =
-
-width + "%";
-
-}
-
-}, 600);
-
-let messages = [
-
-"工程師正在追進度中 🚀",
-
-"你的爆米花還沒涼 🍿",
-
-"下一集沒有消失放心 🎬",
-
-"伺服器正在全力修復中"
-
+// ===== 訊息輪播 =====
+const allMessages = [
+  '☕ 伺服器正在補咖啡中...',
+  '🔧 工程師剛到現場，找停車位中...',
+  '🍕 訂了披薩，等外送先...',
+  '💤 重開機中（已打盹 3 次）',
+  '🚀 即將恢復！（第 7 次說了）',
+  '工程師正在追進度中 🚀',
+  '你的爆米花還沒涼 🍿',
+  '下一集沒有消失放心 🎬',
+  '伺服器正在全力修復中 🛠️'
 ];
 
-let messageText =
-
-document.getElementById("message");
-
+const messageEl = document.getElementById('message');
 setInterval(() => {
+  const idx = Math.floor(Math.random() * allMessages.length);
+  if (messageEl) {
+    messageEl.style.opacity = 0;
+    setTimeout(() => {
+      messageEl.innerText = allMessages[idx];
+      messageEl.style.transition = 'opacity 0.5s';
+      messageEl.style.opacity = 1;
+    }, 300);
+  }
+}, 5000);
 
-let randomIndex =
-
-Math.floor(Math.random()*messages.length);
-
-messageText.innerText =
-
-messages[randomIndex];
-
-},5000);
-
-let button =
-
-document.getElementById("nextEpisode");
-
-button.addEventListener("click",()=>{
-
-button.innerText =
-
-"正在努力載入下一集...";
-
+// ===== 播放下一集按鈕 =====
+const button = document.getElementById("nextEpisode");
+button.addEventListener("click", () => {
+  button.innerText = "正在努力載入下一集...";
 });
 
-// =============================================
-// 新增功能
-// =============================================
-
-// --- Toast 工具函式 ---
+// ===== Toast =====
 function showToast(msg) {
   const t = document.getElementById('toast');
   if (!t) return;
@@ -109,19 +74,17 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-// --- 粒子背景 ---
+// ===== 粒子背景 =====
 (function initParticles() {
   const canvas = document.getElementById('particles');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-
   function resize() {
     canvas.width  = window.innerWidth;
     canvas.height = window.innerHeight;
   }
   resize();
   window.addEventListener('resize', resize);
-
   const pts = Array.from({ length: 55 }, () => ({
     x:  Math.random() * window.innerWidth,
     y:  Math.random() * window.innerHeight,
@@ -130,7 +93,6 @@ function showToast(msg) {
     dy: (Math.random() - 0.5) * 0.4,
     a:  Math.random() * 0.45 + 0.08
   }));
-
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const p of pts) {
@@ -145,10 +107,10 @@ function showToast(msg) {
     requestAnimationFrame(draw);
   }
   draw();
-  window._particles = pts; // Konami 特效用
+  window._particles = pts;
 })();
 
-// --- 爆米花點擊互動 ---
+// ===== 爆米花點擊 =====
 (function initPopcorn() {
   const row = document.getElementById('popcornRow');
   if (!row) return;
@@ -162,32 +124,7 @@ function showToast(msg) {
   });
 })();
 
-// --- 幽默訊息輪播（每 5 秒換一句，強化原本邏輯） ---
-const _extraMessages = [
-  '☕ 伺服器正在補咖啡中...',
-  '🔧 工程師剛到現場，找停車位中...',
-  '🍕 訂了披薩，等外送先...',
-  '💤 重開機中（已打盹 3 次）',
-  '🚀 即將恢復！（第 7 次說了）',
-  '工程師正在追進度中 🚀',
-  '你的爆米花還沒涼 🍿',
-  '下一集沒有消失放心 🎬',
-  '伺服器正在全力修復中 🛠️'
-];
-const _msgEl = document.getElementById('message');
-setInterval(() => {
-  const idx = Math.floor(Math.random() * _extraMessages.length);
-  if (_msgEl) {
-    _msgEl.style.opacity = 0;
-    setTimeout(() => {
-      _msgEl.innerText = _extraMessages[idx];
-      _msgEl.style.transition = 'opacity 0.5s';
-      _msgEl.style.opacity = 1;
-    }, 300);
-  }
-}, 5000);
-
-// --- Mini 跑酷遊戲 ---
+// ===== Mini 跑酷遊戲 =====
 (function initGame() {
   const gc = document.getElementById('gameCanvas');
   if (!gc) return;
@@ -198,14 +135,11 @@ setInterval(() => {
   let obs  = [];
 
   function drawServer(x, y) {
-    // 機身
     ctx.fillStyle = '#E50914';
     ctx.fillRect(x, y - srv.h, srv.w, srv.h);
-    // 燈條
     ctx.fillStyle = '#ff6b6b';
     ctx.fillRect(x + 3, y - srv.h + 5,  srv.w - 6, 4);
     ctx.fillRect(x + 3, y - srv.h + 14, srv.w - 6, 4);
-    // 指示燈
     ctx.fillStyle = '#fff';
     ctx.beginPath();
     ctx.arc(x + srv.w - 8, y - srv.h + 9, 3, 0, Math.PI * 2);
@@ -216,30 +150,20 @@ setInterval(() => {
     if (!active) return;
     frame++;
     ctx.clearRect(0, 0, gc.width, gc.height);
-
-    // 地板
     ctx.fillStyle = '#444';
     ctx.fillRect(0, groundY + 2, gc.width, 1);
-
-    // 重力
     srv.vy += 0.6;
     srv.y  += srv.vy;
     if (srv.y >= groundY) { srv.y = groundY; srv.vy = 0; srv.jumping = false; }
-
-    // 分數
     score++;
     spd = 2.5 + score / 600;
     const sd = document.getElementById('scoreDisplay');
     if (sd) sd.textContent = Math.floor(score / 5);
-
-    // 障礙生成
     spawnT++;
     if (spawnT > 70 + Math.random() * 60) {
       obs.push({ x: 510, y: groundY, w: 12, h: 15 + Math.random() * 28 });
       spawnT = 0;
     }
-
-    // 障礙移動 & 碰撞
     for (let i = obs.length - 1; i >= 0; i--) {
       const o = obs[i];
       o.x -= spd;
@@ -253,7 +177,6 @@ setInterval(() => {
         srv.y > o.y - o.h
       ) { gameOver(); return; }
     }
-
     drawServer(srv.x, srv.y);
     requestAnimationFrame(loop);
   }
@@ -287,15 +210,13 @@ setInterval(() => {
     }
     jump();
   });
-
   document.addEventListener('keydown', e => {
     if (e.code === 'Space') { e.preventDefault(); jump(); }
   });
-
   loop();
 })();
 
-// --- 彩蛋按鈕 ---
+// ===== 彩蛋按鈕 =====
 const _eggMsgs = [
   '🥚 發現彩蛋！工程師偷偷躲在這裡睡覺 💤',
   '🎭 404: 彩蛋不存在（這就是彩蛋）',
@@ -313,7 +234,7 @@ function revealEasterEgg() {
   showToast(_eggMsgs[_eggIdx++ % _eggMsgs.length]);
 }
 
-// --- Konami Code ---
+// ===== Konami Code =====
 (function initKonami() {
   const code = [
     'ArrowUp','ArrowUp','ArrowDown','ArrowDown',
@@ -326,19 +247,14 @@ function revealEasterEgg() {
       if (++idx === code.length) {
         idx = 0;
         showToast('🎮 KONAMI CODE！獲得無限等待耐心 +999');
-        document.querySelector('.logo').style.animationDuration = '0.15s';
-        if (window._particles) {
-          window._particles.forEach(p => { p.dx *= 6; p.dy *= 6; });
-        }
+        const logo = document.querySelector('.logo');
+        if (logo) logo.style.animationDuration = '0.15s';
+        if (window._particles) window._particles.forEach(p => { p.dx *= 6; p.dy *= 6; });
         setTimeout(() => {
-          document.querySelector('.logo').style.animationDuration = '';
-          if (window._particles) {
-            window._particles.forEach(p => { p.dx /= 6; p.dy /= 6; });
-          }
+          if (logo) logo.style.animationDuration = '';
+          if (window._particles) window._particles.forEach(p => { p.dx /= 6; p.dy /= 6; });
         }, 3000);
       }
-    } else {
-      idx = 0;
-    }
+    } else idx = 0;
   });
 })();
