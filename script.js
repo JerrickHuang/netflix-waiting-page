@@ -349,3 +349,289 @@ function revealEasterEgg() {
     } else idx = 0;
   });
 })();
+
+// =============================================
+// 音效系統（Web Audio API，無需外部檔案）
+// =============================================
+
+const SFX = (() => {
+  let ctx = null;
+
+  function getCtx() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    return ctx;
+  }
+
+  // 基礎播放器
+  function play(fn) {
+    try { fn(getCtx()); } catch(e) {}
+  }
+
+  // 工具：建立 oscillator
+  function osc(ac, type, freq, start, end, vol = 0.3) {
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = type;
+    o.frequency.setValueAtTime(freq, ac.currentTime + start);
+    g.gain.setValueAtTime(vol, ac.currentTime + start);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + end);
+    o.start(ac.currentTime + start);
+    o.stop(ac.currentTime + end);
+  }
+
+  // 🍿 爆米花爆炸音（隨機短促高頻 pop）
+  function popcornPop() {
+    play(ac => {
+      const buf = ac.createBuffer(1, ac.sampleRate * 0.08, ac.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 3);
+      }
+      const src = ac.createBufferSource();
+      const g = ac.createGain();
+      const filter = ac.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 800 + Math.random() * 400;
+      src.buffer = buf;
+      src.connect(filter); filter.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(0.6, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.08);
+      src.start();
+    });
+  }
+
+  // ⏳ 按鈕點擊音（每階段不同音調）
+  function buttonClick(stageIdx) {
+    play(ac => {
+      const freqs = [440, 523, 392, 349, 294, 659, 220, 523];
+      const types = ['sine','triangle','square','sawtooth','sine','triangle','square','sine'];
+      const freq = freqs[stageIdx % freqs.length];
+      const type = types[stageIdx % types.length];
+      osc(ac, type, freq,       0,    0.05, 0.25);
+      osc(ac, type, freq * 1.5, 0.03, 0.12, 0.15);
+    });
+  }
+
+  // 🎉 假裝成功（上升大和弦）
+  function fakeSuccess() {
+    play(ac => {
+      [[0, 523], [0.08, 659], [0.16, 784], [0.24, 1047]].forEach(([t, f]) => {
+        osc(ac, 'sine', f, t, t + 0.35, 0.2);
+      });
+    });
+  }
+
+  // 💀 伺服器放棄（下滑悲鳴）
+  function giveUp() {
+    play(ac => {
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(400, ac.currentTime);
+      o.frequency.exponentialRampToValueAtTime(60, ac.currentTime + 0.8);
+      g.gain.setValueAtTime(0.3, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.9);
+      o.start(); o.stop(ac.currentTime + 0.9);
+    });
+  }
+
+  // 🥚 彩蛋音（神秘音效）
+  function easterEgg() {
+    play(ac => {
+      [0, 0.1, 0.2, 0.3, 0.4].forEach((t, i) => {
+        const freq = [800, 1000, 1200, 1000, 1400][i];
+        osc(ac, 'sine', freq, t, t + 0.12, 0.18);
+      });
+    });
+  }
+
+  // 🎮 跳躍音（短促上彈）
+  function jump() {
+    play(ac => {
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.type = 'square';
+      o.frequency.setValueAtTime(300, ac.currentTime);
+      o.frequency.exponentialRampToValueAtTime(600, ac.currentTime + 0.1);
+      g.gain.setValueAtTime(0.15, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.12);
+      o.start(); o.stop(ac.currentTime + 0.12);
+    });
+  }
+
+  // 💥 遊戲結束（撞牆音）
+  function gameOver() {
+    play(ac => {
+      // 低頻撞擊
+      const buf = ac.createBuffer(1, ac.sampleRate * 0.3, ac.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 1.5);
+      }
+      const src = ac.createBufferSource();
+      const g = ac.createGain();
+      const f = ac.createBiquadFilter();
+      f.type = 'lowpass'; f.frequency.value = 200;
+      src.buffer = buf;
+      src.connect(f); f.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(0.8, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.3);
+      src.start();
+
+      // 悲傷音符
+      osc(ac, 'sine', 220, 0.05, 0.4, 0.2);
+      osc(ac, 'sine', 185, 0.15, 0.5, 0.15);
+    });
+  }
+
+  // 🔄 重置音（輕快重來）
+  function reset() {
+    play(ac => {
+      [0, 0.07, 0.14].forEach((t, i) => {
+        osc(ac, 'sine', [440, 550, 660][i], t, t + 0.1, 0.15);
+      });
+    });
+  }
+
+  // 📡 Konami Code（8bit 勝利曲）
+  function konami() {
+    play(ac => {
+      const melody = [
+        [0,    523, 0.12],
+        [0.12, 523, 0.12],
+        [0.24, 523, 0.12],
+        [0.36, 415, 0.09],
+        [0.45, 523, 0.12],
+        [0.57, 659, 0.24],
+        [0.81, 523, 0.36],
+      ];
+      melody.forEach(([t, f, dur]) => {
+        osc(ac, 'square', f, t, t + dur, 0.18);
+      });
+    });
+  }
+
+  // ⏱ 倒數最後 10 秒提示音（每秒一聲）
+  function countdownTick(secondsLeft) {
+    if (secondsLeft > 10) return;
+    play(ac => {
+      const freq = secondsLeft <= 3 ? 880 : 660;
+      osc(ac, 'sine', freq, 0, 0.08, secondsLeft <= 3 ? 0.35 : 0.2);
+    });
+  }
+
+  // 🎉 倒數結束（勝利小號）
+  function countdownEnd() {
+    play(ac => {
+      [[0, 392], [0.1, 523], [0.2, 659], [0.3, 784], [0.45, 1047]].forEach(([t, f]) => {
+        osc(ac, 'triangle', f, t, t + 0.25, 0.22);
+      });
+    });
+  }
+
+  return {
+    popcornPop, buttonClick, fakeSuccess, giveUp,
+    easterEgg, jump, gameOver, reset, konami,
+    countdownTick, countdownEnd
+  };
+})();
+
+
+// =============================================
+// 把音效掛進現有的各個互動事件
+// =============================================
+
+// — 爆米花點擊音 —
+(function patchPopcorn() {
+  const row = document.getElementById('popcornRow');
+  if (!row) return;
+  row.addEventListener('click', e => {
+    if (e.target.tagName === 'SPAN') SFX.popcornPop();
+  });
+})();
+
+// — 按鈕多階段音效（patch 現有按鈕邏輯） —
+(function patchButton() {
+  const btn = document.getElementById('nextEpisode');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    // stageIdx 是外層 script 的變數，這裡用 data attribute 追蹤音效用的 index
+    const idx = parseInt(btn.dataset.sfxStage || '0');
+    if (idx === 4) SFX.fakeSuccess();
+    else if (idx === 5) SFX.giveUp();
+    else if (idx === 6) SFX.reset();
+    else SFX.buttonClick(idx);
+    btn.dataset.sfxStage = String((idx + 1) % 7);
+  });
+})();
+
+// — 彩蛋按鈕音 —
+(function patchEgg() {
+  const btn = document.querySelector('.secret-btn');
+  if (!btn) return;
+  btn.addEventListener('click', () => SFX.easterEgg());
+})();
+
+// — 遊戲跳躍 & 撞牆音（patch gameCanvas） —
+(function patchGame() {
+  const gc = document.getElementById('gameCanvas');
+  if (!gc) return;
+
+  // 攔截跳躍：監聽空白鍵 & canvas 點擊
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space') SFX.jump();
+  }, true); // capture phase，在遊戲邏輯之前觸發
+
+  gc.addEventListener('click', () => SFX.jump(), true);
+
+  // 攔截遊戲結束：觀察 canvas 文字變化（用 MutationObserver 偵測 gameOver 狀態）
+  // 改用輪詢方式偵測遊戲是否結束
+  let _wasActive = true;
+  setInterval(() => {
+    // 透過 canvas 第一個 pixel 是否變深判斷 game over overlay
+    try {
+      const pixel = gc.getContext('2d').getImageData(gc.width / 2, 10, 1, 1).data;
+      const isDark = pixel[3] > 100 && pixel[0] < 30; // 半透明黑色覆蓋
+      if (isDark && _wasActive) { SFX.gameOver(); _wasActive = false; }
+      if (!isDark) { _wasActive = true; }
+    } catch(e) {}
+  }, 100);
+})();
+
+// — 倒數計時音效（patch 現有 countdownTimer） —
+(function patchCountdown() {
+  // 把音效注入 flipTo，每次翻牌時判斷
+  const _origFlipTo = window.flipTo; // 若 flipTo 是全域函式
+  const elSec = document.getElementById('cdSec');
+  if (!elSec) return;
+
+  // 用 MutationObserver 監聽秒數變化
+  const observer = new MutationObserver(() => {
+    const val = parseInt(elSec.textContent);
+    if (!isNaN(val)) {
+      if (val === 0 && parseInt(document.getElementById('cdMin')?.textContent) === 0) {
+        SFX.countdownEnd();
+      } else {
+        SFX.countdownTick(val);
+      }
+    }
+  });
+  observer.observe(elSec, { childList: true, characterData: true, subtree: true });
+})();
+
+// — Konami Code 音效 —
+(function patchKonami() {
+  // Konami 已在前面實作，這裡補上音效
+  // 用 CustomEvent 或直接 override konami 偵測的方式
+  const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
+                 'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let idx = 0;
+  document.addEventListener('keydown', e => {
+    if (e.key === code[idx]) {
+      if (++idx === code.length) { idx = 0; SFX.konami(); }
+    } else idx = 0;
+  });
+})();
