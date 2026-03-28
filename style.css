@@ -83,3 +83,195 @@ border: none;
 cursor: pointer;
 
 }
+
+/* =============================================
+   新增樣式
+   ============================================= */
+
+/* 粒子 canvas */
+#particles {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 確保原本內容在粒子上層 */
+.logo, .container, .game-section,
+.secret-btn, .konami-hint {
+  position: relative;
+  z-index: 1;
+}
+
+/* Logo 紅光脈動 */
+@keyframes logoPulse {
+  0%, 100% { text-shadow: 0 0 40px rgba(229,9,20,0.5); }
+  50%       { text-shadow: 0 0 80px rgba(229,9,20,0.9), 0 0 120px rgba(229,9,20,0.4); }
+}
+.logo {
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+/* 爆米花列 */
+.popcorn-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0;
+  font-size: 1.4rem;
+}
+.popcorn-row span {
+  display: inline-block;
+  cursor: pointer;
+  animation: popcornBounce 0.8s ease-in-out infinite;
+}
+.popcorn-row span:nth-child(2) { animation-delay: 0.15s; }
+.popcorn-row span:nth-child(3) { animation-delay: 0.30s; }
+.popcorn-row span:nth-child(4) { animation-delay: 0.45s; }
+.popcorn-row span:nth-child(5) { animation-delay: 0.60s; }
+@keyframes popcornBounce {
+  0%, 100% { transform: translateY(0)     rotate(-5deg); }
+  50%       { transform: translateY(-12px) rotate( 5deg); }
+}
+
+/* 翻牌倒數 */
+.countdown-wrap {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: flex-end;
+  margin: 16px 0;
+}
+.countdown-unit {
+  text-align: center;
+}
+.countdown-num {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  transition: transform 0.15s ease;
+}
+.countdown-num.flip {
+  transform: scaleY(0);
+}
+.countdown-label {
+  font-size: 0.6rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+.countdown-sep {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #E50914;
+  padding-bottom: 6px;
+  animation: sepBlink 1s infinite;
+}
+@keyframes sepBlink {
+  0%, 100% { opacity: 1;   }
+  50%       { opacity: 0.2; }
+}
+
+/* 遊戲區 */
+.game-section {
+  position: relative;
+  z-index: 1;
+  margin-top: 28px;
+  border-top: 1px solid #333;
+  padding-top: 16px;
+  text-align: center;
+}
+.game-prompt {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 8px;
+}
+.game-prompt strong {
+  color: #E50914;
+}
+#gameCanvas {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+  cursor: pointer;
+}
+.game-score {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 6px;
+}
+#scoreDisplay {
+  color: #E50914;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* 彩蛋按鈕 */
+.secret-btn {
+  display: block;
+  background: none;
+  border: 1px solid #333;
+  color: #555;
+  font-size: 0.75rem;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 16px auto 0;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.secret-btn:hover {
+  border-color: #E50914;
+  color: #E50914;
+}
+
+/* Konami 提示（幾乎看不見，故意的） */
+.konami-hint {
+  font-size: 0.65rem;
+  color: #222;
+  text-align: center;
+  margin-top: 6px;
+  letter-spacing: 2px;
+  transition: color 0.3s;
+}
+.konami-hint:hover {
+  color: #555;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  background: #E50914;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* shake 動畫（彩蛋按鈕用） */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX( 8px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX( 4px); }
+}
+.shake {
+  animation: shake 0.4s ease;
+}
