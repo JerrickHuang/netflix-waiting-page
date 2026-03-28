@@ -1,119 +1,74 @@
+/* ===== 基礎 ===== */
+* {
+  box-sizing: border-box;
+}
+
 body {
-
-background-color: #141414;
-
-color: white;
-
-font-family: Arial, sans-serif;
-
-margin: 0;
-
-display: flex;
-
-justify-content: center;
-
-align-items: center;
-
-height: 100vh;
-
-}
-
-.logo {
-
-position: absolute;
-
-top: 20px;
-
-left: 40px;
-
-color: #E50914;
-
-font-size: 32px;
-
-font-weight: bold;
-
-}
-
-.container {
-
-text-align: center;
-
-}
-
-.progress-bar {
-
-width: 300px;
-
-height: 10px;
-
-background: gray;
-
-margin: 20px auto;
-
-border-radius: 10px;
-
-overflow: hidden;
-
-}
-
-.progress {
-
-height: 100%;
-
-width: 0%;
-
-background: #E50914;
-
-}
-
-button {
-
-margin-top: 20px;
-
-padding: 10px 20px;
-
-font-size: 16px;
-
-background: #E50914;
-
-color: white;
-
-border: none;
-
-cursor: pointer;
-
-}
-
-/* =============================================
-   新增樣式
-   ============================================= */
-
-/* 粒子 canvas */
-#particles {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* 確保原本內容在粒子上層 */
-.logo, .container, .game-section,
-.secret-btn, .konami-hint {
+  background-color: #141414;
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  z-index: 1;
+  overflow-x: hidden;
 }
 
-/* Logo 紅光脈動 */
+/* ===== Logo ===== */
+.logo {
+  position: fixed;
+  top: 20px;
+  left: 40px;
+  color: #E50914;
+  font-size: 32px;
+  font-weight: bold;
+  z-index: 10;
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
 @keyframes logoPulse {
   0%, 100% { text-shadow: 0 0 40px rgba(229,9,20,0.5); }
   50%       { text-shadow: 0 0 80px rgba(229,9,20,0.9), 0 0 120px rgba(229,9,20,0.4); }
 }
-.logo {
-  animation: logoPulse 3s ease-in-out infinite;
+
+/* ===== 整頁垂直排列容器 ===== */
+.page-wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  padding: 80px 20px 40px;
 }
 
-/* 爆米花列 */
+/* ===== 主內容區 ===== */
+.container {
+  text-align: center;
+  width: 100%;
+}
+
+/* ===== 進度條 ===== */
+.progress-bar {
+  width: 300px;
+  height: 10px;
+  background: gray;
+  margin: 20px auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  width: 0%;
+  background: #E50914;
+}
+
+/* ===== 爆米花列 ===== */
 .popcorn-row {
   display: flex;
   justify-content: center;
@@ -121,6 +76,7 @@ cursor: pointer;
   margin: 12px 0;
   font-size: 1.4rem;
 }
+
 .popcorn-row span {
   display: inline-block;
   cursor: pointer;
@@ -130,12 +86,13 @@ cursor: pointer;
 .popcorn-row span:nth-child(3) { animation-delay: 0.30s; }
 .popcorn-row span:nth-child(4) { animation-delay: 0.45s; }
 .popcorn-row span:nth-child(5) { animation-delay: 0.60s; }
+
 @keyframes popcornBounce {
   0%, 100% { transform: translateY(0)     rotate(-5deg); }
   50%       { transform: translateY(-12px) rotate( 5deg); }
 }
 
-/* 翻牌倒數 */
+/* ===== 翻牌倒數 ===== */
 .countdown-wrap {
   display: flex;
   gap: 12px;
@@ -143,9 +100,11 @@ cursor: pointer;
   align-items: flex-end;
   margin: 16px 0;
 }
+
 .countdown-unit {
   text-align: center;
 }
+
 .countdown-num {
   font-size: 3rem;
   font-weight: 900;
@@ -153,9 +112,11 @@ cursor: pointer;
   color: #fff;
   transition: transform 0.15s ease;
 }
+
 .countdown-num.flip {
   transform: scaleY(0);
 }
+
 .countdown-label {
   font-size: 0.6rem;
   color: #666;
@@ -163,6 +124,7 @@ cursor: pointer;
   letter-spacing: 2px;
   margin-top: 4px;
 }
+
 .countdown-sep {
   font-size: 2.5rem;
   font-weight: 900;
@@ -170,28 +132,56 @@ cursor: pointer;
   padding-bottom: 6px;
   animation: sepBlink 1s infinite;
 }
+
 @keyframes sepBlink {
   0%, 100% { opacity: 1;   }
   50%       { opacity: 0.2; }
 }
 
-/* 遊戲區 */
+/* ===== 狀態訊息 ===== */
+.status-msg {
+  background: rgba(229,9,20,0.1);
+  border: 1px solid rgba(229,9,20,0.3);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  color: #ff6b6b;
+  margin: 12px auto;
+  max-width: 420px;
+  transition: opacity 0.5s;
+}
+
+/* ===== 按鈕 ===== */
+button#nextEpisode {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #E50914;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* ===== 小遊戲區 ===== */
 .game-section {
-  position: relative;
-  z-index: 1;
+  width: 100%;
   margin-top: 28px;
   border-top: 1px solid #333;
   padding-top: 16px;
   text-align: center;
 }
+
 .game-prompt {
   font-size: 0.85rem;
   color: #888;
   margin-bottom: 8px;
 }
+
 .game-prompt strong {
   color: #E50914;
 }
+
 #gameCanvas {
   background: #1a1a1a;
   border: 1px solid #333;
@@ -199,19 +189,22 @@ cursor: pointer;
   display: block;
   margin: 0 auto;
   cursor: pointer;
+  max-width: 100%;
 }
+
 .game-score {
   font-size: 0.85rem;
   color: #666;
   margin-top: 6px;
 }
+
 #scoreDisplay {
   color: #E50914;
   font-weight: 700;
   font-size: 1rem;
 }
 
-/* 彩蛋按鈕 */
+/* ===== 彩蛋按鈕 ===== */
 .secret-btn {
   display: block;
   background: none;
@@ -225,12 +218,13 @@ cursor: pointer;
   letter-spacing: 1px;
   transition: all 0.2s;
 }
+
 .secret-btn:hover {
   border-color: #E50914;
   color: #E50914;
 }
 
-/* Konami 提示（幾乎看不見，故意的） */
+/* ===== Konami 提示 ===== */
 .konami-hint {
   font-size: 0.65rem;
   color: #222;
@@ -239,11 +233,12 @@ cursor: pointer;
   letter-spacing: 2px;
   transition: color 0.3s;
 }
+
 .konami-hint:hover {
   color: #555;
 }
 
-/* Toast */
+/* ===== Toast ===== */
 .toast {
   position: fixed;
   bottom: 2rem;
@@ -260,11 +255,12 @@ cursor: pointer;
   white-space: nowrap;
   pointer-events: none;
 }
+
 .toast.show {
   transform: translateX(-50%) translateY(0);
 }
 
-/* shake 動畫（彩蛋按鈕用） */
+/* ===== Shake ===== */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20%       { transform: translateX(-8px); }
@@ -272,6 +268,16 @@ cursor: pointer;
   60%       { transform: translateX(-4px); }
   80%       { transform: translateX( 4px); }
 }
+
 .shake {
   animation: shake 0.4s ease;
+}
+
+/* ===== 粒子 canvas ===== */
+#particles {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
 }
