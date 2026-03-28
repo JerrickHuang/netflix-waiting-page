@@ -22,16 +22,12 @@ const elSec = document.getElementById('cdSec');
 const countdownTimer = setInterval(() => {
   time--;
   if (time <= 0) {
-    // 播放結束音效與提示
     flipTo(elMin, '00');
     flipTo(elSec, '00');
     showToast('☕ 咖啡喝完了！再等一輪！');
     SFX.countdownEnd();
-
-    // 1.5 秒後自動重置回 60 秒繼續循環
-    setTimeout(() => {
-      time = 60;
-    }, 1500);
+    // 1.5 秒後自動重置回 60 秒，繼續循環，不影響遊戲
+    setTimeout(() => { time = 60; }, 1500);
     return;
   }
   flipTo(elMin, pad(Math.floor(time / 60)));
@@ -280,8 +276,12 @@ function showToast(msg) {
     requestAnimationFrame(loop);
   }
 
-  function jump() {
-    if (!srv.jumping && active) { srv.vy = -9; srv.jumping = true; }
+ function jump() {
+    if (!srv.jumping && active) {
+      srv.vy = -9;
+      srv.jumping = true;
+      SFX.jump(); // 音效統一在這裡播，只響一次
+    }
   }
 
   function gameOver() {
@@ -601,24 +601,13 @@ const SFX = (() => {
 })();
 
 // — 彩蛋按鈕音 —
-(function patchEgg() {
-  const btn = document.querySelector('.secret-btn');
-  if (!btn) return;
-  btn.addEventListener('click', () => SFX.easterEgg());
-})();
-
-// — 遊戲跳躍 & 撞牆音（patch gameCanvas） —
 (function patchGame() {
   const gc = document.getElementById('gameCanvas');
   if (!gc) return;
 
-  // 只用 keydown 觸發跳躍音，canvas click 的音效由遊戲內部統一管理
-  document.addEventListener('keydown', e => {
-    if (e.code === 'Space') SFX.jump();
-  }, true);
+  // 跳躍音效已在 initGame 的 jump() 內部統一處理，這裡不重複監聽
 
-  // 不在這裡重複監聽 gc click，避免雙重音效
-
+  // 偵測遊戲結束（撞牆）播放音效
   let _wasActive = true;
   setInterval(() => {
     try {
