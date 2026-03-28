@@ -284,8 +284,20 @@ function showToast(msg) {
     }
   }
 
-  function gameOver() {
+ function gameOver() {
     active = false;
+
+    // 先記錄最終分數，再重置內部變數
+    const finalScore = Math.floor(score / 5);
+
+    obs = []; spd = 2.5; frame = 0; spawnT = 0;
+    score = 0; // 內部變數歸零，準備下一局
+
+    // 畫面顯示最終分數（不歸零顯示）
+    const sd = document.getElementById('scoreDisplay');
+    if (sd) sd.textContent = finalScore;
+
+    // 繪製 Game Over 遮罩
     ctx.fillStyle = 'rgba(0,0,0,0.75)';
     ctx.fillRect(0, 0, gc.width, gc.height);
     ctx.fillStyle = '#E50914';
@@ -294,17 +306,14 @@ function showToast(msg) {
     ctx.fillText('GG！伺服器撞牆了 😵', gc.width / 2, 44);
     ctx.fillStyle = '#aaa';
     ctx.font = '13px Arial';
-    ctx.fillText('點擊重新開始', gc.width / 2, 68);
-    obs = []; spd = 2.5; frame = 0; spawnT = 0;
-    score = 0; // 死亡才重置分數
-    const sd = document.getElementById('scoreDisplay');
-    if (sd) sd.textContent = '0';
+    ctx.fillText(`本局得分：${finalScore}　點擊重新開始`, gc.width / 2, 68);
   }
 
   gc.addEventListener('click', () => {
     if (!active) {
       active = true;
       srv.y = groundY; srv.vy = 0;
+      // 重新開始時才把分數顯示歸零
       const sd = document.getElementById('scoreDisplay');
       if (sd) sd.textContent = '0';
       loop();
