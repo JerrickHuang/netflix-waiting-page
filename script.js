@@ -59,10 +59,81 @@ setInterval(() => {
   }
 }, 5000);
 
-// ===== 播放下一集按鈕 =====
+// ===== 播放下一集按鈕（多階段互動） =====
 const button = document.getElementById("nextEpisode");
+
+const stages = [
+  { text: "▶ 播放下一集",           style: "#E50914", action: null },
+  { text: "⏳ 正在連線伺服器...",     style: "#c57800", action: null },
+  { text: "☕ 伺服器去倒咖啡了...",   style: "#7a4e00", action: null },
+  { text: "🔄 重新嘗試連線中...",     style: "#1a6e3a", action: null },
+  { text: "📡 訊號微弱，再按一次！",  style: "#1a3a7a", action: null },
+  { text: "🎉 載入成功！（騙你的）",  style: "#5a1a7a", action: "fake_success" },
+  { text: "💀 伺服器徹底放棄了",      style: "#555",    action: "give_up" },
+  { text: "🔃 好啦重來...",          style: "#E50914", action: "reset" },
+];
+
+let stageIdx = 0;
+let isAnimating = false;
+
+function setButtonStage(idx) {
+  const s = stages[idx];
+  button.style.background = s.style;
+  button.style.transition = "background 0.4s, transform 0.1s";
+
+  if (s.action === "fake_success") {
+    button.innerText = s.text;
+    // 假裝成功：進度條瞬間滿
+    const bar = document.querySelector(".progress");
+    if (bar) { bar.style.transition = "width 0.3s"; bar.style.width = "100%"; }
+    showToast("🎬 載入完成！Just kidding 😈");
+    setTimeout(() => {
+      if (bar) { bar.style.transition = "width 2s"; bar.style.width = "30%"; }
+    }, 1500);
+
+  } else if (s.action === "give_up") {
+    button.innerText = s.text;
+    // 抖動效果
+    button.style.animation = "shake 0.4s ease";
+    setTimeout(() => { button.style.animation = ""; }, 400);
+    showToast("😂 工程師已離職，請改用 YouTube");
+
+  } else if (s.action === "reset") {
+    // 短暫閃爍後回到第一階
+    button.innerText = s.text;
+    setTimeout(() => {
+      stageIdx = 0;
+      setButtonStage(0);
+    }, 1200);
+    return; // 不再推進 idx
+
+  } else {
+    button.innerText = s.text;
+    // 一般階段：顯示對應 toast
+    const toasts = [
+      null,
+      "📶 正在嘗試叫醒伺服器...",
+      "☕ 等它喝完咖啡就好了",
+      "🔄 第三次嘗試，感覺這次行了！",
+      "📡 收到 1 格訊號，別動！",
+    ];
+    if (toasts[idx]) showToast(toasts[idx]);
+  }
+}
+
 button.addEventListener("click", () => {
-  button.innerText = "正在努力載入下一集...";
+  if (isAnimating) return;
+  isAnimating = true;
+
+  // 按下時輕微縮放回饋
+  button.style.transform = "scale(0.95)";
+  setTimeout(() => { button.style.transform = "scale(1)"; }, 100);
+
+  stageIdx = (stageIdx + 1) % stages.length;
+  setTimeout(() => {
+    setButtonStage(stageIdx);
+    isAnimating = false;
+  }, 120);
 });
 
 // ===== Toast =====
