@@ -22,12 +22,16 @@ const elSec = document.getElementById('cdSec');
 const countdownTimer = setInterval(() => {
   time--;
   if (time <= 0) {
-    clearInterval(countdownTimer);
+    // 播放結束音效與提示
     flipTo(elMin, '00');
     flipTo(elSec, '00');
-    showToast('☕ 咖啡喝完了！繼續玩遊戲吧！');
+    showToast('☕ 咖啡喝完了！再等一輪！');
     SFX.countdownEnd();
-    // 倒數結束，不影響遊戲，不 reload
+
+    // 1.5 秒後自動重置回 60 秒繼續循環
+    setTimeout(() => {
+      time = 60;
+    }, 1500);
     return;
   }
   flipTo(elMin, pad(Math.floor(time / 60)));
@@ -248,9 +252,12 @@ function showToast(msg) {
     srv.y  += srv.vy;
     if (srv.y >= groundY) { srv.y = groundY; srv.vy = 0; srv.jumping = false; }
     score++;
-    spd = 2.5 + score / 600;
+    // 基礎速度 + 每 100 分固定增加 0.5，讓玩家明顯感受到難度跳升
+    const displayScore = Math.floor(score / 5);
+    const speedTier = Math.floor(displayScore / 100); // 每 100 分升一階
+    spd = 2.5 + speedTier * 0.5;
     const sd = document.getElementById('scoreDisplay');
-    if (sd) sd.textContent = Math.floor(score / 5);
+    if (sd) sd.textContent = displayScore;
     spawnT++;
     if (spawnT > 70 + Math.random() * 60) {
       obs.push({ x: 510, y: groundY, w: 12, h: 15 + Math.random() * 28 });
@@ -605,21 +612,18 @@ const SFX = (() => {
   const gc = document.getElementById('gameCanvas');
   if (!gc) return;
 
-  // 攔截跳躍：監聽空白鍵 & canvas 點擊
+  // 只用 keydown 觸發跳躍音，canvas click 的音效由遊戲內部統一管理
   document.addEventListener('keydown', e => {
     if (e.code === 'Space') SFX.jump();
-  }, true); // capture phase，在遊戲邏輯之前觸發
+  }, true);
 
-  gc.addEventListener('click', () => SFX.jump(), true);
+  // 不在這裡重複監聽 gc click，避免雙重音效
 
-  // 攔截遊戲結束：觀察 canvas 文字變化（用 MutationObserver 偵測 gameOver 狀態）
-  // 改用輪詢方式偵測遊戲是否結束
   let _wasActive = true;
   setInterval(() => {
-    // 透過 canvas 第一個 pixel 是否變深判斷 game over overlay
     try {
       const pixel = gc.getContext('2d').getImageData(gc.width / 2, 10, 1, 1).data;
-      const isDark = pixel[3] > 100 && pixel[0] < 30; // 半透明黑色覆蓋
+      const isDark = pixel[3] > 100 && pixel[0] < 30;
       if (isDark && _wasActive) { SFX.gameOver(); _wasActive = false; }
       if (!isDark) { _wasActive = true; }
     } catch(e) {}
