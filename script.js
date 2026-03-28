@@ -447,18 +447,43 @@ const SFX = (() => {
     });
   }
 
-  // 🎮 跳躍音（短促上彈）
+  // 🎮 跳躍音（可愛彈跳音 — 雙音節 boing）
   function jump() {
     play(ac => {
-      const o = ac.createOscillator();
-      const g = ac.createGain();
-      o.connect(g); g.connect(ac.destination);
-      o.type = 'square';
-      o.frequency.setValueAtTime(300, ac.currentTime);
-      o.frequency.exponentialRampToValueAtTime(600, ac.currentTime + 0.1);
-      g.gain.setValueAtTime(0.15, ac.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.12);
-      o.start(); o.stop(ac.currentTime + 0.12);
+      // 第一音：圓潤上彈
+      const o1 = ac.createOscillator();
+      const g1 = ac.createGain();
+      o1.connect(g1); g1.connect(ac.destination);
+      o1.type = 'sine';
+      o1.frequency.setValueAtTime(180, ac.currentTime);
+      o1.frequency.exponentialRampToValueAtTime(520, ac.currentTime + 0.13);
+      g1.gain.setValueAtTime(0.28, ac.currentTime);
+      g1.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.18);
+      o1.start(); o1.stop(ac.currentTime + 0.18);
+
+      // 第二音：稍高一點的回響，營造 boing 感
+      const o2 = ac.createOscillator();
+      const g2 = ac.createGain();
+      o2.connect(g2); g2.connect(ac.destination);
+      o2.type = 'sine';
+      o2.frequency.setValueAtTime(260, ac.currentTime + 0.06);
+      o2.frequency.exponentialRampToValueAtTime(700, ac.currentTime + 0.22);
+      g2.gain.setValueAtTime(0.18, ac.currentTime + 0.06);
+      g2.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.26);
+      o2.start(ac.currentTime + 0.06);
+      o2.stop(ac.currentTime + 0.26);
+
+      // 第三音：輕微顫音收尾（像彈簧）
+      const o3 = ac.createOscillator();
+      const g3 = ac.createGain();
+      o3.connect(g3); g3.connect(ac.destination);
+      o3.type = 'triangle';
+      o3.frequency.setValueAtTime(900, ac.currentTime + 0.18);
+      o3.frequency.linearRampToValueAtTime(750, ac.currentTime + 0.30);
+      g3.gain.setValueAtTime(0.10, ac.currentTime + 0.18);
+      g3.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.32);
+      o3.start(ac.currentTime + 0.18);
+      o3.stop(ac.currentTime + 0.32);
     });
   }
 
@@ -514,13 +539,9 @@ const SFX = (() => {
     });
   }
 
-  // ⏱ 倒數最後 10 秒提示音（每秒一聲）
+  // ⏱ 倒數 tick（已停用）
   function countdownTick(secondsLeft) {
-    if (secondsLeft > 10) return;
-    play(ac => {
-      const freq = secondsLeft <= 3 ? 880 : 660;
-      osc(ac, 'sine', freq, 0, 0.08, secondsLeft <= 3 ? 0.35 : 0.2);
-    });
+    // 取消 tick 音效，不做任何事
   }
 
   // 🎉 倒數結束（勝利小號）
