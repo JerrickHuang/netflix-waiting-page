@@ -47,15 +47,15 @@ const allMessages = [
   '伺服器正在全力修復中 🛠️'
 ];
 
-const messageEl = document.getElementById('message');
+const statusEl = document.getElementById('statusMsg');
 setInterval(() => {
   const idx = Math.floor(Math.random() * allMessages.length);
-  if (messageEl) {
-    messageEl.style.opacity = 0;
+  if (statusEl) {
+    statusEl.style.opacity = 0;
     setTimeout(() => {
-      messageEl.innerText = allMessages[idx];
-      messageEl.style.transition = 'opacity 0.5s';
-      messageEl.style.opacity = 1;
+      statusEl.textContent = allMessages[idx];
+      statusEl.style.transition = 'opacity 0.5s';
+      statusEl.style.opacity = 1;
     }, 300);
   }
 }, 5000);
