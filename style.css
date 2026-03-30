@@ -97,7 +97,7 @@ body {
   display: flex;
   gap: 12px;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   margin: 16px 0;
 }
 
@@ -129,8 +129,11 @@ body {
   font-size: 2.5rem;
   font-weight: 900;
   color: #E50914;
-  padding-bottom: 6px;
   animation: sepBlink 1s infinite;
+  align-self: center;
+  padding-bottom: 0;
+  line-height: 1;
+  margin-bottom: 20px;  /* 配合下方 .countdown-label 的空間視覺置中 */
 }
 
 @keyframes sepBlink {
